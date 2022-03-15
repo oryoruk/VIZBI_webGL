@@ -1,0 +1,40 @@
+<html>
+<head>
+	<title>Hello Cube!</title>
+	<style>
+	body {
+		background-color: #000000;
+		margin:  0;
+		padding:  0;
+		height:  100%;
+		overflow: hidden !important;
+	}
+</style>
+	<script type="text/javascript" src="https://get.goXTK.com/xtk_edge.js"></script>
+	    <script type="text/javascript" src="http://get.goXTK.com/xtk_xdat.gui.js"></script>
+
+<script type="text/javascript">
+	window.onload = function(){
+		var r = new X.renderer3D();
+		r.init();
+		var cube = new  X.cube();
+		r.add(cube);
+		var cube2= new  X.cube();
+		cube2.center=[-30,0,0];
+		r.add(cube2);
+
+		r.render();
+		var gui = new dat.GUI();
+		gui.addColor(cube, 'color');
+		gui.add(cube, 'lengthX',0,100).onChange(function(){
+			cube.modified();
+		});
+
+		gui.open();
+	};
+</script>
+</head>
+<body>
+	</body>
+
+</html>
