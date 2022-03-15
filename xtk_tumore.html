@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>MRI+Fibers+Mesh!</title>
+    <style>
+      body { 
+        background-color:#000;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden !important;  
+      }
+    </style>
+    <script type="text/javascript" src="https://get.goXTK.com/xtk_edge.js"></script>
+    <script type="text/javascript" src="http://get.goXTK.com/xtk_xdat.gui.js"></script>
+    <script type="text/javascript">
+      window.onload = function() {
+
+        var r = new X.renderer3D();
+        r.init();
+
+        var v = new X.volume();
+        v.file = 't2_mri.nii';
+        r.add(v);
+
+        var f = new X.fibers();
+        f.file = 'tracks.trk';
+        r.add(f);
+
+        var m = new X.mesh();
+        m.file = 'tumor.vtk';
+        r.add(m);
+
+        r.camera.position = [0,0,1000];
+
+        r.render();
+
+      };
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

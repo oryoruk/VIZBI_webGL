@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <title>3D Ultrasound!</title>
+    <style>
+      body { 
+        background-color:#000;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden !important;  
+      }
+    </style>
+    <script src="https://threejs.org/build/three.min.js" type="text/javascript"></script>
+    <script src="https://threejs.org/examples/js/controls/TrackballControls.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://get.goXTK.com/xtk_xdat.gui.js"></script>
+
+    <script src="https://threejs.org/examples/js/loaders/NRRDLoader.js" type="text/javascript"></script>
+    <script src="https://threejs.org/examples/js/libs/fflate.min.js" type="text/javascript"></script>
+    <script src="https://threejs.org/examples/js/misc/Volume.js" type="text/javascript"></script>
+    <script src="https://threejs.org/examples/js/misc/VolumeSlice.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+      window.onload = function() {
+
+        // setup scene
+        var scene = new THREE.Scene();
+
+        // configure camera
+        var fov = 75;
+        var ratio = window.innerWidth / window.innerHeight;
+        var zNear = 1;
+        var zFar = 10000;
+        var camera = new THREE.PerspectiveCamera( fov, ratio, zNear, zFar );
+        camera.position.set(0, 0, 100);
+
+        // .. add WebGL Renderer
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.append(renderer.domElement);
+
+        //.. setup lights
+        ambientLight = new THREE.AmbientLight( 0x404040 );
+        scene.add( ambientLight );
+
+        light = new THREE.DirectionalLight( 0xffffff, 5.0 );
+        light.position.set( 10, 100, 10 );
+        scene.add( light );
+
+
+
+        // LOAD NRRD FILE
+        var gui = new dat.GUI();
+
+        var loader = new THREE.NRRDLoader();
+        loader.load( 'ultrasound.nrrd', function ( volume ) {
+
+          var geometry = new THREE.BoxGeometry( volume.xLength, volume.yLength, volume.zLength );
+          var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+          var cube = new THREE.Mesh( geometry, material );
+          cube.visible = false;
+          var box = new THREE.BoxHelper( cube );
+          scene.add( box );
+          box.applyMatrix4( volume.matrix );
+          scene.add( cube );
+
+          //z plane
+          var sliceZ = volume.extractSlice( 'z', Math.floor( volume.RASDimensions[ 2 ] / 4 ) );
+          scene.add( sliceZ.mesh );
+
+          //y plane
+          var sliceY = volume.extractSlice( 'y', Math.floor( volume.RASDimensions[ 1 ] / 2 ) );
+          scene.add( sliceY.mesh );
+
+          //x plane
+          var sliceX = volume.extractSlice( 'x', Math.floor( volume.RASDimensions[ 0 ] / 2 ) );
+          scene.add( sliceX.mesh );
+
+          gui.add( sliceX, 'index', 0, volume.RASDimensions[ 0 ], 1 ).name( 'indexX' ).onChange( function () {
+
+            sliceX.repaint.call( sliceX );
+
+          } );
+          gui.add( sliceY, 'index', 0, volume.RASDimensions[ 1 ], 1 ).name( 'indexY' ).onChange( function () {
+
+            sliceY.repaint.call( sliceY );
+
+          } );
+          gui.add( sliceZ, 'index', 0, volume.RASDimensions[ 2 ], 1 ).name( 'indexZ' ).onChange( function () {
+
+            sliceZ.repaint.call( sliceZ );
+
+          } );
+
+        });
+
+
+
+
+        // and the trackball
+        var controls = new THREE.TrackballControls(camera, renderer.domElement);
+
+        // start rendering!
+        render();
+
+
+        // the rendering loop!
+        function render() {
+
+          controls.update();
+          renderer.render(scene, camera);
+          
+          requestAnimationFrame(render);
+        }
+
+      };
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

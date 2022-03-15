@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>3D Ultrasound!</title>
+    <style>
+      body { 
+        background-color:#000;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden !important;  
+      }
+    </style>
+    <script type="text/javascript" src="https://get.goXTK.com/xtk_edge.js"></script>
+    <script type="text/javascript" src="http://get.goXTK.com/xtk_xdat.gui.js"></script>
+    <script type="text/javascript">
+      window.onload = function() {
+
+        var r = new X.renderer3D();
+        r.init();
+
+        var v = new X.volume();
+        v.file = 'ultrasound.nrrd';
+
+        r.add(v);
+        r.render();
+
+
+        // the onShowtime method gets executed after all files were fully loaded and
+        // just before the first rendering attempt
+        r.onShowtime = function() {
+
+          //
+          // The GUI panel
+          //
+          // (we need to create this during onShowtime(..) since we do not know the
+          // volume dimensions before the loading was completed)
+          
+          var gui = new dat.GUI();
+          
+          // the following configures the gui for interacting with the X.volume
+          var volumegui = gui.addFolder('Volume');
+          // the indexX,Y,Z are the currently displayed slice indices in the range
+          // 0..dimensions-1
+          var sliceXController = volumegui.add(v, 'indexX', 0,
+              v.range[0] - 1);
+          var sliceYController = volumegui.add(v, 'indexY', 0,
+              v.range[1] - 1);
+          var sliceZController = volumegui.add(v, 'indexZ', 0,
+              v.range[2] - 1);
+          volumegui.open();
+          
+        };
+
+      };
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
